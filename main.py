@@ -1,9 +1,9 @@
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
-
 from variables import *
 from utils import *
+from sklearn.decomposition import PCA
 
 def run(X, y, model, model_name, param_grid, scoring='f1', cv=10):
     
@@ -11,8 +11,10 @@ def run(X, y, model, model_name, param_grid, scoring='f1', cv=10):
     
     for technique in tqdm(TECHNIQUES, desc="Resampling Techniques"):
         X_resampled, y_resampled = apply_sampling_technique(X, y, technique)
-        
-        
+
+        pca = PCA(n_components=0.95)
+        X_resampled = pca.fit_transform(X_resampled)
+
         cv_results = apply_grid_search_cv(
             X_resampled, y_resampled, model, param_grid, scoring=scoring, cv=cv
         )
