@@ -8,6 +8,7 @@ from sklearn.tree import DecisionTreeClassifier
 from utils import load_and_preprocess_data
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.compose import ColumnTransformer
+from utils import apply_sampling_technique, apply_grid_search_cv
 
 
 def read_data(path="results/"):
@@ -45,6 +46,7 @@ def apply_best_model(results_train, test, test_ids, model):
     print(model)
     
     X, y = load_and_preprocess_data()
+    X, y = apply_sampling_technique(X, y)
     
     model.fit(X, y)
     predictions = model.predict(test)
@@ -62,8 +64,9 @@ def process_test_data(test):
     ids = test['id']
     test.drop('id', axis=1, inplace=True)
 
-    test["ApplicationDate"] = pd.to_datetime(test["ApplicationDate"])
-    test["ApplicationDate"] = test["ApplicationDate"].apply(lambda x: x.toordinal())
+    # test["ApplicationDate"] = pd.to_datetime(test["ApplicationDate"])
+    # test["ApplicationDate"] = test["ApplicationDate"].apply(lambda x: x.toordinal())
+    test.drop("ApplicationDate", axis=1, inplace=True)
 
     # Identificar colunas categóricas e numéricas
     categorical_cols = test.select_dtypes(include='object').columns
@@ -102,7 +105,6 @@ if __name__ == "__main__":
     predictions = apply_best_model(best, 
                                    test, 
                                    test_ids= test_ids, 
-                                   model="GaussianNB")
+                                   model="RandomForestClassifier")
 
-    predictions.to_csv('predictions_nb.csv', index=False)
-    
+    predictions.to_csv('predictions_rf.csv', index=False)

@@ -11,6 +11,8 @@ from imblearn.over_sampling import RandomOverSampler
 from imblearn.over_sampling import SMOTE
 from imblearn.under_sampling import TomekLinks
 from imblearn.under_sampling import NearMiss
+from sklearn.decomposition import PCA
+
 
 
 def load_and_preprocess_data(path='train.csv'):
@@ -39,9 +41,9 @@ def load_and_preprocess_data(path='train.csv'):
     df.drop("LoanApproved", axis=1, inplace=True)
     df.dropna(inplace=True)
 
-    df["ApplicationDate"] = pd.to_datetime(df["ApplicationDate"])
-    df["ApplicationDate"] = df["ApplicationDate"].apply(lambda x: x.toordinal())
-
+    # df["ApplicationDate"] = pd.to_datetime(df["ApplicationDate"])
+    # df["ApplicationDate"] = df["ApplicationDate"].apply(lambda x: x.toordinal())
+    df.drop("ApplicationDate", axis=1, inplace=True)
 
     # Separar features (X) e target (y)
     X = df.drop("class", axis=1)
@@ -93,7 +95,7 @@ def apply_grid_search_cv(X, y, estimator, param_grid, scoring='f1', cv=10):
     grid_search.fit(X, y)
     return grid_search.cv_results_
 
-def apply_sampling_technique(X, y, technique, **kwargs):
+def apply_sampling_technique(X, y, technique='RandomOverSampler', **kwargs):
     """
     Aplica uma técnica de amostragem (undersampling, oversampling, SMOTE, etc.) nos dados.
     
