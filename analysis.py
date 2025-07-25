@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import plotly.express as px
+from sklearn.decomposition import PCA
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.naive_bayes import GaussianNB
@@ -46,9 +47,10 @@ def apply_best_model(results_train, test, test_ids, model):
     print(model)
     
     X, y = load_and_preprocess_data()
-    X, y = apply_sampling_technique(X, y)
+    X_resampled, y_resampled = apply_sampling_technique(X, y, best_model["Technique"])
     
-    model.fit(X, y)
+    model.fit(X_resampled, y_resampled)
+    
     predictions = model.predict(test)
     
     results = pd.DataFrame({
