@@ -10,12 +10,15 @@ def run(X, y, model, model_name, param_grid, scoring='f1', cv=10):
     results = pd.DataFrame(columns=["Technique", "Model", "F1 Score", "Parameters", "Fold"])
     
     for technique in tqdm(TECHNIQUES, desc="Resampling Techniques"):
+        print(f"Applying {technique} with {model_name}")
         X_resampled, y_resampled = apply_sampling_technique(X, y, technique)
-
+        print(f"Running Grid Search for {model_name} with {technique}")
         cv_results = apply_grid_search_cv(
             X_resampled, y_resampled, model, param_grid, scoring=scoring, cv=cv
         )
+        print(f"Grid Search completed for {model_name} with {technique}")
         
+        # Append results for each fold
         for i in tqdm(range(len(cv_results['mean_test_score'])), desc="CV Iterations", leave=False):
             new_row = pd.DataFrame([{
                 "Technique": technique,

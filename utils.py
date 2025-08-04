@@ -90,7 +90,8 @@ def apply_grid_search_cv(X, y, estimator, param_grid, scoring='f1', cv=10):
         param_grid=param_grid,
         scoring=scoring,     # Usando F1-score para avaliação
         cv=cv,         # Mostra o progresso detalhado
-        n_jobs=-1
+        n_jobs=-1,
+        verbose=1,
     )
     grid_search.fit(X, y)
     return grid_search.cv_results_
@@ -120,7 +121,7 @@ def apply_sampling_technique(X, y, technique='RandomOverSampler', **kwargs):
         sampler = NearMiss(**kwargs)
     else:
         raise ValueError("Técnica de amostragem desconhecida: {}".format(technique))
-    
+    print("fitting sampler")
     X_resampled, y_resampled = sampler.fit_resample(X, y)
     return X_resampled, y_resampled
 
