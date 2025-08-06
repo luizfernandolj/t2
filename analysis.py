@@ -10,20 +10,21 @@ from utils import load_and_preprocess_data
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.compose import ColumnTransformer
 from utils import apply_sampling_technique, apply_grid_search_cv
+from sklearn.preprocessing import OrdinalEncoder
 
 
 def read_data(path="results/"):
-    knn = pd.read_csv(path + "KNeighborsClassifier.csv")
+    #knn = pd.read_csv(path + "KNeighborsClassifier.csv")
     rf = pd.read_csv(path + "RandomForestClassifier.csv")
-    nb = pd.read_csv(path + "GaussianNB.csv")
-    dt = pd.read_csv(path + "DecisionTreeClassifier.csv")
+    #nb = pd.read_csv(path + "GaussianNB.csv")
+    #dt = pd.read_csv(path + "DecisionTreeClassifier.csv")
     
-    knn.dropna(inplace=True)
+    #knn.dropna(inplace=True)
     rf.dropna(inplace=True)
-    nb.dropna(inplace=True)
-    dt.dropna(inplace=True)
+    #nb.dropna(inplace=True)
+    #dt.dropna(inplace=True)
     
-    return knn, rf, nb, dt
+    return rf #knn, rf, nb, dt
 
 
 def apply_best_model(results_train, test, test_ids, model):
@@ -38,7 +39,7 @@ def apply_best_model(results_train, test, test_ids, model):
     elif model_name == 'RandomForestClassifier':
         model = RandomForestClassifier(**eval(parameters))
     elif model_name == 'GaussianNB':
-        model = GaussianNB  (**eval(parameters))
+        model = GaussianNB (**eval(parameters))
     elif model_name == 'DecisionTreeClassifier':    
         model = DecisionTreeClassifier(**eval(parameters))
     else:
@@ -70,14 +71,17 @@ def process_test_data(test):
     # test["ApplicationDate"] = test["ApplicationDate"].apply(lambda x: x.toordinal())
     test.drop("ApplicationDate", axis=1, inplace=True)
 
-    # Identificar colunas categóricas e numéricas
-    categorical_cols = test.select_dtypes(include='object').columns
-    numerical_cols = test.select_dtypes(exclude='object').columns
+    ordinal_cols = ["EducationLevel"]
+    categorical_cols = X.select_dtypes(include='object').columns
+    categorical_cols = categorical_cols.difference(ordinal_cols)
+    numerical_cols = X.select_dtypes(exclude='object').columns
+    
 
     # Criar o ColumnTransformer
     # O remainder='passthrough' garante que as colunas numéricas que não são transformadas fiquem no dataset
     preprocessor = ColumnTransformer(
         transformers=[
+            ('ordinal', OrdinalEncoder(), ordinal_cols),
             ('onehot', OneHotEncoder(handle_unknown='ignore'), categorical_cols),
             ('scaler', StandardScaler(), numerical_cols)
         ],
@@ -94,9 +98,9 @@ def process_test_data(test):
 
 
 if __name__ == "__main__":
-    knn, rf, nb, dt = read_data()
+    rf = read_data()
     
-    results = pd.concat([knn, rf, nb, dt], axis=0, ignore_index=True)
+    results = pd.concat([rf], axis=0, ignore_index=True)
     
     best = results.loc[results.groupby('Model')['F1 Score'].idxmax()]
     

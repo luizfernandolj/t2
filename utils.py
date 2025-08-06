@@ -12,6 +12,7 @@ from imblearn.over_sampling import SMOTE
 from imblearn.under_sampling import TomekLinks
 from imblearn.under_sampling import NearMiss
 from sklearn.decomposition import PCA
+from sklearn.preprocessing import OrdinalEncoder
 
 
 
@@ -50,13 +51,17 @@ def load_and_preprocess_data(path='train.csv'):
     y = df["class"]
 
     # Identificar colunas categóricas e numéricas
+    ordinal_cols = ["EducationLevel"]
     categorical_cols = X.select_dtypes(include='object').columns
+    categorical_cols = categorical_cols.difference(ordinal_cols)
     numerical_cols = X.select_dtypes(exclude='object').columns
+    
 
     # Criar o ColumnTransformer
     # O remainder='passthrough' garante que as colunas numéricas que não são transformadas fiquem no dataset
     preprocessor = ColumnTransformer(
         transformers=[
+            ('ordinal', OrdinalEncoder(), ordinal_cols),
             ('onehot', OneHotEncoder(handle_unknown='ignore'), categorical_cols),
             ('scaler', StandardScaler(), numerical_cols)
         ],
@@ -120,9 +125,13 @@ def apply_sampling_technique(X, y, technique='RandomOverSampler', **kwargs):
     elif technique == 'NearMiss':
         sampler = NearMiss(**kwargs)
     else:
-        raise ValueError("Técnica de amostragem desconhecida: {}".format(technique))
+        sampler = None
     print("fitting sampler")
-    X_resampled, y_resampled = sampler.fit_resample(X, y)
+    
+    if sampler is None:
+        X_resampled, y_resampled = X, y
+    else:
+        X_resampled, y_resampled = sampler.fit_resample(X, y)
     return X_resampled, y_resampled
 
 def evaluate_f1_scores(X, y, classifier, cv=10):

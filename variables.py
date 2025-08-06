@@ -6,18 +6,19 @@ from sklearn.tree import DecisionTreeClassifier
 
 
 TECHNIQUES = [
-    # "RandomUnderSampler",
+    "RandomUnderSampler",
     "RandomOverSampler",
-    # "SMOTE",
-    # "TomekLinks",
-    # "NearMiss"
+    "SMOTE",
+    "TomekLinks",
+    "NearMiss",
+    "None"
 ]
 
 MODELS = {
     "RandomForestClassifier": RandomForestClassifier(),
-    # "KNeighborsClassifier": KNeighborsClassifier(),
-    # "GaussianNB": GaussianNB(),
-    # "DecisionTreeClassifier": DecisionTreeClassifier()
+    "KNeighborsClassifier": KNeighborsClassifier(),
+    "GaussianNB": GaussianNB(),
+    "DecisionTreeClassifier": DecisionTreeClassifier()
 }
 
 parameters_knn = {
@@ -45,14 +46,13 @@ parameters_dt = {
 
 
 parameters_rf = {
-    "n_estimators": [50, 100, 200],
+    "n_estimators": [25, 50, 100, 200, 500, 1000],
     "criterion": ["gini", "entropy"],
     "max_depth": [None, 10, 20, 30],
     "min_samples_split": [2, 5, 10],
     "min_samples_leaf": [1, 2, 4],
     "max_features": ["sqrt", "log2"],
     "bootstrap": [True, False],
-    "random_state": [42]
 }
 
 
